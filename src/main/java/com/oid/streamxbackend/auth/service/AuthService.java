@@ -3,6 +3,9 @@ package com.oid.streamxbackend.auth.service;
 import com.oid.streamxbackend.auth.dto.AuthResponse;
 import com.oid.streamxbackend.auth.dto.LoginRequest;
 import com.oid.streamxbackend.auth.dto.RegisterRequest;
+import com.oid.streamxbackend.common.exception.EmailAlreadyExistsException;
+import com.oid.streamxbackend.common.exception.InvalidCredentialException;
+import com.oid.streamxbackend.common.exception.UsernameAlreadyExistsException;
 import com.oid.streamxbackend.security.JwtService;
 import com.oid.streamxbackend.user.entity.Role;
 import com.oid.streamxbackend.user.entity.User;
@@ -25,11 +28,11 @@ public class AuthService {
     public void register(RegisterRequest request){
 
         if(userRepository.existsByEmail(request.email())){
-            throw new IllegalArgumentException("Email is already exist");
+            throw new EmailAlreadyExistsException("Email is already exist");
         }
 
         if (userRepository.existsByUsername(request.username())){
-            throw  new IllegalArgumentException("username is already exist");
+            throw  new UsernameAlreadyExistsException("username is already exist");
         }
 
         User user  =  User.builder()
@@ -46,14 +49,14 @@ public class AuthService {
     public AuthResponse login(LoginRequest request){
         User user  = userRepository.findByEmail(request.email())
                 .orElseThrow(
-                        () -> new IllegalArgumentException("Invalid  Email or Password")
+                        () -> new InvalidCredentialException("Invalid  Email or Password")
                 );
 
     if (!passwordEncoder.matches(
             request.password(),
             user.getPassword()
     )){
-        throw  new IllegalArgumentException("Invalid email or password");
+        throw  new InvalidCredentialException("Invalid email or password");
     }
 
     String token  =  jwtService.generateToken(user);
