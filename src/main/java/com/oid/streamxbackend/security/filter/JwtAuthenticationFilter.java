@@ -52,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 if(user != null && jwtService.isTokenValid(token, user)){
                     SimpleGrantedAuthority authority = new SimpleGrantedAuthority(
-                            "ROLE " + user.getRole().name()
+                            "ROLE_" + user.getRole().name()
                     );
 
                     UsernamePasswordAuthenticationToken authentication =  new UsernamePasswordAuthenticationToken(
