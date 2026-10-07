@@ -1,5 +1,7 @@
 package com.oid.streamxbackend.auth.controller;
 
+import com.oid.streamxbackend.auth.dto.AuthResponse;
+import com.oid.streamxbackend.auth.dto.LoginRequest;
 import com.oid.streamxbackend.auth.dto.RegisterRequest;
 import com.oid.streamxbackend.auth.service.AuthService;
 import jakarta.validation.Valid;
@@ -25,6 +27,11 @@ public class AuthController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body("user created successfully");
+    }
+
+    @PostMapping("/login")
+    public  ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request){
+        return ResponseEntity.ok(authService.login(request));
     }
 
 }

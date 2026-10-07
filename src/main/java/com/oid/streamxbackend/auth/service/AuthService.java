@@ -1,6 +1,9 @@
 package com.oid.streamxbackend.auth.service;
 
+import com.oid.streamxbackend.auth.dto.AuthResponse;
+import com.oid.streamxbackend.auth.dto.LoginRequest;
 import com.oid.streamxbackend.auth.dto.RegisterRequest;
+import com.oid.streamxbackend.security.JwtService;
 import com.oid.streamxbackend.user.entity.Role;
 import com.oid.streamxbackend.user.entity.User;
 import com.oid.streamxbackend.user.repository.UserRepository;
@@ -11,10 +14,11 @@ import org.springframework.stereotype.Service;
 public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
-    public AuthService(UserRepository userRepository , PasswordEncoder passwordEncoder){
+    private  final JwtService jwtService;
+    public AuthService(UserRepository userRepository , PasswordEncoder passwordEncoder , JwtService jwtService){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
 
     }
 
@@ -37,6 +41,23 @@ public class AuthService {
 
         userRepository.save(user);
 
+    }
+
+    public AuthResponse login(LoginRequest request){
+        User user  = userRepository.findByEmail(request.email())
+                .orElseThrow(
+                        () -> new IllegalArgumentException("Invalid  Email or Password")
+                );
+
+    if (!passwordEncoder.matches(
+            request.password(),
+            user.getPassword()
+    )){
+        throw  new IllegalArgumentException("Invalid email or password");
+    }
+
+    String token  =  jwtService.generateToken(user);
+       return new AuthResponse(token , "Bearer");
     }
 
 
