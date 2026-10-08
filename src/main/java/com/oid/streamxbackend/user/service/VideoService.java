@@ -1,0 +1,117 @@
+package com.oid.streamxbackend.user.service;
+
+import com.oid.streamxbackend.user.entity.User;
+import com.oid.streamxbackend.video.dto.CreateVideoRequest;
+import com.oid.streamxbackend.video.dto.UpdateVideoRequest;
+import com.oid.streamxbackend.video.dto.VideoResponse;
+import com.oid.streamxbackend.video.entity.Video;
+import com.oid.streamxbackend.video.entity.VideoStatus;
+import com.oid.streamxbackend.video.repository.VideoRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class VideoService {
+
+
+    private  final VideoRepository videoRepository;
+
+    public VideoService(VideoRepository videoRepository){
+        this.videoRepository = videoRepository;
+    }
+
+    public VideoResponse createVideo(CreateVideoRequest request , User user){
+
+        Video  video = Video.builder()
+                .title(request.title())
+                .description(request.description())
+                .thumbnailUrl(request.thumbnailUrl())
+                .videoUrl(request.videoUrl())
+                .videoStatus(VideoStatus.UPLOADING)
+                .views(0L)
+                .uploadedBy(user)
+                .build();
+
+
+        Video saveVideo =   videoRepository.save(video);
+
+        return toResponse(saveVideo);
+    }
+
+
+     public List<VideoResponse> getAllVideos(){
+        return videoRepository.findAll()
+                .stream()
+                .map(this::toResponse)
+                .toList();
+     }
+
+
+     public  VideoResponse  getVideoById(Long id){
+        Video video =  videoRepository.findById(id)
+                .orElseThrow(()-> new RuntimeException("Video not found with " + id));
+      return  toResponse(video);
+    }
+
+
+
+    public  VideoResponse updateVideo(Long id , UpdateVideoRequest request , User user){
+        Video video = videoRepository.findById(id)
+                .orElseThrow(
+                        () -> new RuntimeException("Video not found with " + id)
+                );
+
+         validOwnerShip(video,user);
+
+         video.setTitle(request.title());
+         video.setDescription(request.description());
+         video.setThumbnailUrl(request.thumbnailUrl());
+         video.setVideoUrl(request.videoUrl());
+
+         Video updateVideo = videoRepository.save(video);
+
+         return toResponse(updateVideo);
+    }
+
+    public  void  deleteVideo(Long id , User user){
+         Video video =  videoRepository.findById(id)
+                 .orElseThrow(()-> new RuntimeException("\" Video not found with " + id));
+
+         validOwnerShip(video,user);
+
+         videoRepository.delete(video);
+    }
+
+
+    private  void validOwnerShip(Video
+                                 video , User user){
+        if(!video.getUploadedBy().getId().equals(user.getId())){
+            throw new RuntimeException(
+                    "You not allowed  to modify this video"
+            );
+        }
+    }
+
+
+
+    private  VideoResponse toResponse(Video  video){
+        return new VideoResponse(
+                video.getId(),
+                video.getTitle(),
+                video.getDescription(),
+                video.getThumbnailUrl(),
+                video.getVideoUrl(),
+                video.getVideoStatus(),
+                video.getViews(),
+                video.getUploadedBy().getId(),
+                video.getCreatedAt(),
+                video.getUpdatedAt()
+        );
+    }
+
+
+
+
+
+}
