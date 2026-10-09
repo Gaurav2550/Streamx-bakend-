@@ -9,9 +9,9 @@ import com.oid.streamxbackend.video.dto.VideoResponse;
 import com.oid.streamxbackend.video.entity.Video;
 import com.oid.streamxbackend.video.entity.VideoStatus;
 import com.oid.streamxbackend.video.repository.VideoRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class VideoService {
@@ -42,11 +42,10 @@ public class VideoService {
     }
 
 
-     public List<VideoResponse> getAllVideos(){
-        return videoRepository.findAll()
-                .stream()
-                .map(this::toResponse)
-                .toList();
+     public Page<VideoResponse> getAllVideos(Pageable pageable){
+        return videoRepository.findAll(pageable)
+                .map(this::toResponse);
+
      }
 
 

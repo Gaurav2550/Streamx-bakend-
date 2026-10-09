@@ -7,6 +7,10 @@ import com.oid.streamxbackend.video.dto.CreateVideoRequest;
 import com.oid.streamxbackend.video.dto.UpdateVideoRequest;
 import com.oid.streamxbackend.video.dto.VideoResponse;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -37,8 +41,12 @@ public class VideoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<VideoResponse>> getAllVideos(){
-        return ResponseEntity.ok(videoService.getAllVideos());
+    public ResponseEntity<Page<VideoResponse>> getAllVideos(@PageableDefault(
+            size = 10 ,
+            sort = "createdAt",
+            direction = Sort.Direction.DESC
+    )Pageable pageable){
+        return ResponseEntity.ok(videoService.getAllVideos(pageable));
     }
 
     @GetMapping("/{id}")
