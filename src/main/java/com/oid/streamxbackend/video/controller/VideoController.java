@@ -23,6 +23,7 @@ public class VideoController {
         this.videoService=videoService;
     }
 
+    @PostMapping
     public ResponseEntity<VideoResponse> createVideo(@Valid @RequestBody
                                                      CreateVideoRequest videoRequest
                                                      , Authentication authentication
