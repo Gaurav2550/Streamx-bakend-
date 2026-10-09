@@ -2,6 +2,7 @@ package com.oid.streamxbackend.video.controller;
 
 
 import com.oid.streamxbackend.user.entity.User;
+import com.oid.streamxbackend.video.entity.VideoStatus;
 import com.oid.streamxbackend.video.service.VideoService;
 import com.oid.streamxbackend.video.dto.CreateVideoRequest;
 import com.oid.streamxbackend.video.dto.UpdateVideoRequest;
@@ -41,12 +42,15 @@ public class VideoController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<VideoResponse>> getAllVideos(@PageableDefault(
+    public ResponseEntity<Page<VideoResponse>> getAllVideos(
+            @RequestParam(required = false) VideoStatus
+                    status ,
+            @PageableDefault(
             size = 10 ,
             sort = "createdAt",
             direction = Sort.Direction.DESC
     )Pageable pageable){
-        return ResponseEntity.ok(videoService.getAllVideos(pageable));
+        return ResponseEntity.ok(videoService.getAllVideos(status , pageable));
     }
 
     @GetMapping("/{id}")

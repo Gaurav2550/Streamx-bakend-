@@ -36,7 +36,7 @@ public class Video {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false , length = 20)
     @Builder.Default
-    private  VideoStatus videoStatus  =  VideoStatus.UPLOADING;
+    private  VideoStatus status  =  VideoStatus.UPLOADING;
 
     @Column(nullable = false)
     @Builder.Default

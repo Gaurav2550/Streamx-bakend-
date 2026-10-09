@@ -30,7 +30,7 @@ public class VideoService {
                 .description(request.description())
                 .thumbnailUrl(request.thumbnailUrl())
                 .videoUrl(request.videoUrl())
-                .videoStatus(VideoStatus.UPLOADING)
+                .status(VideoStatus.UPLOADING)
                 .views(0L)
                 .uploadedBy(user)
                 .build();
@@ -42,10 +42,16 @@ public class VideoService {
     }
 
 
-     public Page<VideoResponse> getAllVideos(Pageable pageable){
-        return videoRepository.findAll(pageable)
-                .map(this::toResponse);
+     public Page<VideoResponse> getAllVideos(VideoStatus status ,Pageable pageable){
 
+         Page<Video> videos;
+
+         if (status == null){
+             videos = videoRepository.findAll(pageable);
+         }else {
+             videos =  videoRepository.findByStatus(status , pageable);
+         }
+          return videos.map(this::toResponse);
      }
 
 
@@ -103,7 +109,7 @@ public class VideoService {
                 video.getDescription(),
                 video.getThumbnailUrl(),
                 video.getVideoUrl(),
-                video.getVideoStatus(),
+                video.getStatus(),
                 video.getViews(),
                 video.getUploadedBy().getId(),
                 video.getCreatedAt(),
