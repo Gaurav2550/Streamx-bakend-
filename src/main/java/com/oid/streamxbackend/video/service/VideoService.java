@@ -1,5 +1,7 @@
-package com.oid.streamxbackend.user.service;
+package com.oid.streamxbackend.video.service;
 
+import com.oid.streamxbackend.common.exception.VideoAccessDeniedException;
+import com.oid.streamxbackend.common.exception.VideoNotFoundException;
 import com.oid.streamxbackend.user.entity.User;
 import com.oid.streamxbackend.video.dto.CreateVideoRequest;
 import com.oid.streamxbackend.video.dto.UpdateVideoRequest;
@@ -50,7 +52,7 @@ public class VideoService {
 
      public  VideoResponse  getVideoById(Long id){
         Video video =  videoRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Video not found with " + id));
+                .orElseThrow(()-> new VideoNotFoundException("Video not found with " + id));
       return  toResponse(video);
     }
 
@@ -59,7 +61,7 @@ public class VideoService {
     public  VideoResponse updateVideo(Long id , UpdateVideoRequest request , User user){
         Video video = videoRepository.findById(id)
                 .orElseThrow(
-                        () -> new RuntimeException("Video not found with " + id)
+                        () -> new VideoNotFoundException("Video not found with " + id)
                 );
 
          validOwnerShip(video,user);
@@ -76,7 +78,7 @@ public class VideoService {
 
     public  void  deleteVideo(Long id , User user){
          Video video =  videoRepository.findById(id)
-                 .orElseThrow(()-> new RuntimeException("\" Video not found with " + id));
+                 .orElseThrow(()-> new VideoNotFoundException("\" Video not found with " + id));
 
          validOwnerShip(video,user);
 
@@ -87,7 +89,7 @@ public class VideoService {
     private  void validOwnerShip(Video
                                  video , User user){
         if(!video.getUploadedBy().getId().equals(user.getId())){
-            throw new RuntimeException(
+            throw new VideoAccessDeniedException(
                     "You not allowed  to modify this video"
             );
         }

@@ -2,7 +2,7 @@ package com.oid.streamxbackend.video.controller;
 
 
 import com.oid.streamxbackend.user.entity.User;
-import com.oid.streamxbackend.user.service.VideoService;
+import com.oid.streamxbackend.video.service.VideoService;
 import com.oid.streamxbackend.video.dto.CreateVideoRequest;
 import com.oid.streamxbackend.video.dto.UpdateVideoRequest;
 import com.oid.streamxbackend.video.dto.VideoResponse;

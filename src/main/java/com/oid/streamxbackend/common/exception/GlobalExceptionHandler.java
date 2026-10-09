@@ -11,6 +11,16 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(VideoNotFoundException.class)
+    public ResponseEntity<ApiError> handleVideoNotFoundException(VideoNotFoundException exception){
+        return buildError(HttpStatus.NOT_FOUND , exception.getMessage());
+    }
+
+    public ResponseEntity<ApiError> handleVideoAccessDeniedException(VideoAccessDeniedException exception){
+        return buildError(HttpStatus.FORBIDDEN , exception.getMessage());
+    }
+
+
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<ApiError> handleEmailAlreadyExistsException(
             EmailAlreadyExistsException exception
