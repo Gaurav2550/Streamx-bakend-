@@ -3,6 +3,7 @@ package com.oid.streamxbackend.security;
 import com.oid.streamxbackend.security.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -42,6 +43,7 @@ public class SecurityConfig {
                         ).permitAll()
                                 .requestMatchers("/api/v1/admin/**")
                                 .hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/api/v1/categories/**").hasRole("ADMIN")
                                 .anyRequest()
                                 .authenticated()
 

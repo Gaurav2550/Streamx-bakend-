@@ -2,6 +2,7 @@ package com.oid.streamxbackend.common.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -10,6 +11,12 @@ import java.time.LocalDateTime;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(CategoryAlreadyExistsException.class)
+    public ResponseEntity<ApiError> handleCategoryAlreadyExists(
+            CategoryAlreadyExistsException ex) {
+        return buildError(HttpStatus.CONFLICT , ex.getMessage());
+    }
 
     @ExceptionHandler(VideoNotFoundException.class)
     public ResponseEntity<ApiError> handleVideoNotFoundException(VideoNotFoundException exception){
