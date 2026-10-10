@@ -41,20 +41,23 @@ public class VideoController {
 
     }
 
+
     @GetMapping
     public ResponseEntity<Page<VideoResponse>> getAllVideos(
-            @RequestParam(required = false) String search ,
-            @RequestParam(required = false) VideoStatus
-                    status ,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) VideoStatus status,
+            @RequestParam(required = false) Long categoryId,
             @PageableDefault(
-            size = 10 ,
-            sort = "createdAt",
-            direction = Sort.Direction.DESC
-    )Pageable pageable){
-        if (search != null || !search.isBlank()){
-         return ResponseEntity.ok(videoService.searchVideos(search,pageable));
-        }
-        return ResponseEntity.ok(videoService.getAllVideos(status , pageable));
+                    size = 10,
+                    sort = "createdAt",
+                    direction = Sort.Direction.DESC
+            ) Pageable pageable) {
+
+        return ResponseEntity.ok(
+                videoService.getVideosWithFilters(
+                        search, status, categoryId, pageable
+                )
+        );
     }
 
     @GetMapping("/{id}")
@@ -76,4 +79,11 @@ public class VideoController {
             videoService.deleteVideo(id,user);
             return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{id}/views")
+    public ResponseEntity<Void> incrementViews(@PathVariable Long id) {
+        videoService.incrementViews(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

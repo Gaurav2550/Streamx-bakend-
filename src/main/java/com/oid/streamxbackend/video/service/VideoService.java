@@ -165,5 +165,31 @@ public class VideoService {
         ).map(this::toResponse);
  }
 
+    @Transactional(readOnly = true)
+    public Page<VideoResponse> getVideosWithFilters(
+            String search,
+            VideoStatus status,
+            Long categoryId,
+            Pageable pageable) {
+
+        String normalizedSearch =
+                (search == null || search.isBlank()) ? null : search.trim();
+
+        return videoRepository.findVideosWithFilters(
+                        normalizedSearch,
+                        status,
+                        categoryId,
+                        pageable)
+                .map(this::toResponse);
+    }
+
+    @Transactional
+    public  void  incrementViews(Long videoId){
+        int updatedRows =  videoRepository.incrementViews(videoId);
+        if (updatedRows == 0 ){
+            throw new VideoNotFoundException("video not found with id " +videoId);
+        }
+    }
+
 
 }
