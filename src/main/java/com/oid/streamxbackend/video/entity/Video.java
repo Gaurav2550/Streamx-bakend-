@@ -1,11 +1,14 @@
 package com.oid.streamxbackend.video.entity;
 
+import com.oid.streamxbackend.category.entity.Category;
 import com.oid.streamxbackend.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Entity
@@ -45,6 +48,16 @@ public class Video {
     @ManyToOne(fetch = FetchType.LAZY , optional = false )
     @JoinColumn(name = "user_id" , nullable = false)
     private User uploadedBy;
+
+   @ManyToMany
+   @JoinTable(
+           name = "video_categories",
+           joinColumns = @JoinColumn(name = "video_id"),
+           inverseJoinColumns = @JoinColumn(name = "category_id")
+   )
+   @Builder.Default
+    private Set<Category> categories =  new HashSet<>();
+
 
     @Column(nullable = false,updatable = false)
     private LocalDateTime createdAt;

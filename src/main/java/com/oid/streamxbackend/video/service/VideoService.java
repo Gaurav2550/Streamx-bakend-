@@ -1,8 +1,11 @@
 package com.oid.streamxbackend.video.service;
 
+import com.oid.streamxbackend.category.entity.Category;
+import com.oid.streamxbackend.category.repository.CategoryRepository;
 import com.oid.streamxbackend.common.exception.VideoAccessDeniedException;
 import com.oid.streamxbackend.common.exception.VideoNotFoundException;
 import com.oid.streamxbackend.user.entity.User;
+import com.oid.streamxbackend.video.dto.CategorySummary;
 import com.oid.streamxbackend.video.dto.CreateVideoRequest;
 import com.oid.streamxbackend.video.dto.UpdateVideoRequest;
 import com.oid.streamxbackend.video.dto.VideoResponse;
@@ -13,14 +16,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Service
 public class VideoService {
 
 
     private  final VideoRepository videoRepository;
-
-    public VideoService(VideoRepository videoRepository){
+    private  final CategoryRepository  categoryRepository ;
+    public VideoService(VideoRepository videoRepository, CategoryRepository categoryRepository){
         this.videoRepository = videoRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     public VideoResponse createVideo(CreateVideoRequest request , User user){
@@ -33,6 +40,7 @@ public class VideoService {
                 .status(VideoStatus.UPLOADING)
                 .views(0L)
                 .uploadedBy(user)
+                .categories(findCategories(request.categoryIds()))
                 .build();
 
 
@@ -75,7 +83,7 @@ public class VideoService {
          video.setDescription(request.description());
          video.setThumbnailUrl(request.thumbnailUrl());
          video.setVideoUrl(request.videoUrl());
-
+         video.setCategories(findCategories(request.categoryIds()));
          Video updateVideo = videoRepository.save(video);
 
          return toResponse(updateVideo);
@@ -113,10 +121,36 @@ public class VideoService {
                 video.getViews(),
                 video.getUploadedBy().getId(),
                 video.getCreatedAt(),
-                video.getUpdatedAt()
+                video.getUpdatedAt(),
+                video.getCategories()
+                        .stream()
+                        .map(category -> new CategorySummary(
+                                category.getId(),
+                                category.getName()
+                        ))
+                        .toList()
+
         );
     }
 
+
+    private Set<Category> findCategories(Set<Long> categoryIds) {
+        if (categoryIds == null || categoryIds.isEmpty()) {
+            return new HashSet<>();
+        }
+
+        Set<Category> categories = new HashSet<>(
+                categoryRepository.findAllById(categoryIds)
+        );
+
+        if (categories.size() != categoryIds.size()) {
+            throw new IllegalArgumentException(
+                    "One or more category IDs do not exist"
+            );
+        }
+
+        return categories;
+    }
 
 
 

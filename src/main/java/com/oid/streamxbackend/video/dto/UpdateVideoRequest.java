@@ -1,7 +1,10 @@
 package com.oid.streamxbackend.video.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
+import java.util.Set;
 
 public record UpdateVideoRequest(
         @NotBlank(message = "Title is required")
@@ -16,7 +19,11 @@ public record UpdateVideoRequest(
         String thumbnailUrl
         ,
         @Size(max = 500 , message = "video  url must not be exceed 500 characters")
-        String videoUrl
+        String videoUrl ,
+
+        @Size(max = 20, message = "A video can have at most 20 categories")
+        Set<@NotNull Long> categoryIds
+
 
 ) {
 }

@@ -6,6 +6,8 @@ import com.oid.streamxbackend.category.entity.Category;
 import com.oid.streamxbackend.category.repository.CategoryRepository;
 import com.oid.streamxbackend.common.exception.CategoryAlreadyExistsException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.List;
 
@@ -18,6 +20,7 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
+    @Transactional
    public CategoryResponse createCategory(CreateCategoryRequest categoryRequest ){
         if(categoryRepository.existsByNameIgnoreCase(categoryRequest.name().trim())){
             throw  new CategoryAlreadyExistsException(categoryRequest.name());
@@ -31,7 +34,7 @@ public class CategoryService {
          return toResponse(categoryRepository.save(category));
    }
 
-
+@Transactional(readOnly = true)
    public List<CategoryResponse> getAllCategories(){
         return categoryRepository.findAll()
                 .stream()
