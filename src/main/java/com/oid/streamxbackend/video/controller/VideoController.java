@@ -43,6 +43,7 @@ public class VideoController {
 
     @GetMapping
     public ResponseEntity<Page<VideoResponse>> getAllVideos(
+            @RequestParam(required = false) String search ,
             @RequestParam(required = false) VideoStatus
                     status ,
             @PageableDefault(
@@ -50,6 +51,9 @@ public class VideoController {
             sort = "createdAt",
             direction = Sort.Direction.DESC
     )Pageable pageable){
+        if (search != null || !search.isBlank()){
+         return ResponseEntity.ok(videoService.searchVideos(search,pageable));
+        }
         return ResponseEntity.ok(videoService.getAllVideos(status , pageable));
     }
 

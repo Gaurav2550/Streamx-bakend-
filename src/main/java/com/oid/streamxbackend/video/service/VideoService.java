@@ -153,6 +153,16 @@ public class VideoService {
     }
 
 
+ public Page<VideoResponse> searchVideos(String search , Pageable pageable){
+        if (search == null || search.isBlank()){
+            return getAllVideos(null,pageable);
+        }
+
+        return videoRepository.searchVideos(
+                search.trim(),
+                pageable
+        ).map(this::toResponse);
+ }
 
 
 }
