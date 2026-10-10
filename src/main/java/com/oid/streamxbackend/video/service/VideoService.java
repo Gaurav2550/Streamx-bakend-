@@ -12,6 +12,7 @@ import com.oid.streamxbackend.video.dto.VideoResponse;
 import com.oid.streamxbackend.video.entity.Video;
 import com.oid.streamxbackend.video.entity.VideoStatus;
 import com.oid.streamxbackend.video.repository.VideoRepository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -62,7 +63,7 @@ public class VideoService {
           return videos.map(this::toResponse);
      }
 
-
+     @Transactional(readOnly = true)
      public  VideoResponse  getVideoById(Long id){
         Video video =  videoRepository.findById(id)
                 .orElseThrow(()-> new VideoNotFoundException("Video not found with " + id));
