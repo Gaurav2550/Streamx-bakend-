@@ -9,6 +9,11 @@ import com.oid.streamxbackend.user.entity.User;
 import com.oid.streamxbackend.user.repository.UserRepository;
 import com.oid.streamxbackend.video.entity.Video;
 import com.oid.streamxbackend.video.repository.VideoRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 public class WatchHistoryService {
     private  final WatchHistoryRepository watchHistoryRepository ;
@@ -28,15 +33,28 @@ public class WatchHistoryService {
         Video video =  videoRepository.findById(videoId)
                 .orElseThrow(()-> new VideoNotFoundException("Video not found with Id: " + videoId ));
 
-        WatchHistory watchHistory = WatchHistory.builder()
-                .user(user)
-                .video(video)
-                .build();
-       WatchHistory saved =   watchHistoryRepository.save(watchHistory);
+        WatchHistory history = watchHistoryRepository
+                .findByUser_IdAndVideo_Id(userId, videoId)
+                .orElseGet(() -> WatchHistory.builder()
+                        .user(user)
+                        .video(video)
+                        .build());
+
+        history.setWatchedAt(LocalDateTime.now());
+       WatchHistory saved =   watchHistoryRepository.save(history);
 
          return toResponse(saved);
     }
 
+    @Transactional(readOnly = true)
+    public Page<WatchHistoryResponse> getWatchHistory(
+            Long userId,
+            Pageable pageable) {
+
+        return watchHistoryRepository
+                .findByUser_IdOrderByWatchedAtDesc(userId, pageable)
+                .map(this::toResponse);
+    }
     private  WatchHistoryResponse toResponse(WatchHistory history){
         Video video = history.getVideo();
 

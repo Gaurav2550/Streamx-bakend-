@@ -6,7 +6,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface WatchHistoryRepository
+import java.util.Optional;
+
+ public interface WatchHistoryRepository
         extends JpaRepository<WatchHistory, Long> {
 
     Page<WatchHistory> findByUser_IdOrderByWatchedAtDesc(
@@ -15,4 +17,9 @@ public interface WatchHistoryRepository
     );
 
     void deleteByUserAndVideo_Id(User user, Long videoId);
+
+    Optional<WatchHistory> findByUser_IdAndVideo_Id(
+            Long userId,
+            Long videoId
+    );
 }
