@@ -67,4 +67,22 @@ public class WatchHistoryService {
 
         );
     }
+
+
+    @Transactional
+    public void deleteWatchHistory(Long userId, Long historyId) {
+
+        int deletedRows =
+                watchHistoryRepository.deleteByHistoryIdAndUserId(
+                        historyId, userId);
+
+        if (deletedRows == 0) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.NOT_FOUND,
+                    "Watch history entry not found"
+            );
+        }
+    }
+
+
 }

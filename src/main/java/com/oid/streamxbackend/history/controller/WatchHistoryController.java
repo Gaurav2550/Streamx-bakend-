@@ -50,4 +50,15 @@ public class WatchHistoryController {
                 watchHistoryService.getWatchHistory(userId, pageable)
         );
     }
+    @DeleteMapping("/{historyId}")
+    public ResponseEntity<Void> deleteWatchHistory(
+            @PathVariable Long historyId,
+            Authentication authentication) {
+
+        Long userId = Long.valueOf(authentication.getName());
+
+        watchHistoryService.deleteWatchHistory(userId, historyId);
+
+        return ResponseEntity.noContent().build();
+    }
 }
