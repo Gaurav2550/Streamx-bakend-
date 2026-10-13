@@ -15,10 +15,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/history")
-@RequiredArgsConstructor
 public class WatchHistoryController {
 
     private final WatchHistoryService watchHistoryService;
+
+    public WatchHistoryController(WatchHistoryService watchHistoryService) {
+        this.watchHistoryService = watchHistoryService;
+    }
 
     @PostMapping("/videos/{videoId}")
     public ResponseEntity<WatchHistoryResponse> recordWatch(
