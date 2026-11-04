@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -36,6 +37,8 @@ public class VideoStorageService {
                     "Video file must not exceed 500 MB"
             );
         }
+
+        validateVideoFile(file);
         String originalFilename = file.getOriginalFilename();
         String extension = "";
 
@@ -71,4 +74,24 @@ public class VideoStorageService {
 
         return file;
     }
+
+    private void validateVideoFile(MultipartFile file) {
+
+        String contentType = file.getContentType();
+
+        Set<String> allowedTypes = Set.of(
+                "video/mp4",
+                "video/webm",
+                "video/quicktime",
+                "video/x-matroska"
+        );
+
+        if (contentType == null ||
+                !allowedTypes.contains(contentType.toLowerCase())) {
+            throw new IllegalArgumentException(
+                    "Unsupported video format"
+            );
+        }
+    }
+
 }
