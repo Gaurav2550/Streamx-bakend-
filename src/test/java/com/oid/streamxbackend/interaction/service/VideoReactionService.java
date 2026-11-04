@@ -125,4 +125,32 @@ class VideoReactionServiceTest {
 
         verify(reactionRepository, never()).save(any());
     }
+
+    @Test
+    void shouldRemoveExistingReaction() {
+        VideoReaction existing = VideoReaction.builder()
+                .id(5L)
+                .user(user)
+                .video(video)
+                .reaction(ReactionType.LIKE)
+                .build();
+
+        when(reactionRepository.findByUser_IdAndVideo_Id(1L, 10L))
+                .thenReturn(Optional.of(existing));
+        when(videoRepository.existsById(10L)).thenReturn(true);
+        when(reactionRepository.countByVideo_IdAndReaction(
+                10L, ReactionType.LIKE)).thenReturn(0L);
+        when(reactionRepository.countByVideo_IdAndReaction(
+                10L, ReactionType.DISLIKE)).thenReturn(0L);
+
+        var response = reactionService.removeReaction(1L, 10L);
+
+        assertEquals(10L, response.videoId());
+        assertNull(response.reaction());
+        assertEquals(0L, response.likes());
+        assertEquals(0L, response.dislikes());
+
+        verify(reactionRepository).delete(existing);
+    }
+
 }
