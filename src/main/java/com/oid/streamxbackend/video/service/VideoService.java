@@ -14,6 +14,7 @@ import com.oid.streamxbackend.video.entity.VideoStatus;
 import com.oid.streamxbackend.video.repository.VideoRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +34,10 @@ public class VideoService {
         this.categoryRepository = categoryRepository;
     }
 
-    @CacheEvict(cacheNames = "videos", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "videos", allEntries = true),
+            @CacheEvict(cacheNames = "videoDetails", allEntries = true)
+    })
     public VideoResponse createVideo(CreateVideoRequest request , User user){
 
         Video  video = Video.builder()
@@ -67,6 +71,7 @@ public class VideoService {
      }
 
      @Transactional(readOnly = true)
+     @Cacheable(cacheNames = "videoDetails", key = "#p0")
      public  VideoResponse  getVideoById(Long id){
         Video video =  videoRepository.findById(id)
                 .orElseThrow(()-> new VideoNotFoundException("Video not found with " + id));
@@ -74,7 +79,10 @@ public class VideoService {
     }
 
 
-    @CacheEvict(cacheNames = "videos", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "videos", allEntries = true),
+            @CacheEvict(cacheNames = "videoDetails", allEntries = true)
+    })
     public  VideoResponse updateVideo(Long id , UpdateVideoRequest request , User user){
         Video video = videoRepository.findById(id)
                 .orElseThrow(
@@ -92,7 +100,10 @@ public class VideoService {
 
          return toResponse(updateVideo);
     }
-    @CacheEvict(cacheNames = "videos", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "videos", allEntries = true),
+            @CacheEvict(cacheNames = "videoDetails", allEntries = true)
+    })
     public  void  deleteVideo(Long id , User user){
          Video video =  videoRepository.findById(id)
                  .orElseThrow(()-> new VideoNotFoundException("\" Video not found with " + id));
@@ -191,7 +202,10 @@ public class VideoService {
     }
 
     @Transactional
-    @CacheEvict(cacheNames = "videos", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "videos", allEntries = true),
+            @CacheEvict(cacheNames = "videoDetails", key = "#p0")
+    })
     public  void  incrementViews(Long videoId){
         int updatedRows =  videoRepository.incrementViews(videoId);
         if (updatedRows == 0 ){
